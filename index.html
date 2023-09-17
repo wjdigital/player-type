@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />    
+    <link rel="stylesheet" href="style.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/7.0.5/wavesurfer.min.js"
+      integrity="sha512-g0YjzT7Zude4YED9KMahMGoaN1nJCsyH0MsqPLGsckBK6Gd9WyHw6jtyYcvK53pTGAV8s0AJLB5k4EjIin2jlg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script>
+      const isMobile = detectMob();
+
+      window.addEventListener('load', () => {
+        const audioID = window.location.hash;
+        if(audioID) {
+          createPlayer(document.body, audioID.replace('#', ''));
+        }
+      })
+
+      function createPlayer(container, audioname) {
+        container.innerHTML = "";       
+
+        // Link do avatar
+        const avatarURL = "https://s3.fr-par.scw.cloud/typebot/public/typebots/cli88mae30010mh0f0yzjqn48/hostAvatar?v=1685330922907";
+        // Cor da barra de progresso
+        const corBarraProgresso = "#25D366";
+        // Tipo de arquivo de audio
+        const audioTipo = '.mp3';
+
+        document.body.style.setProperty('--progress-color', corBarraProgresso);
+        
+        const track = document.createElement("div");
+        const controls = document.createElement("div");
+        const timeLine = document.createElement("div");
+        const playPauseBtn = document.createElement("button");
+        const playPauseIcons = `
+            <svg class="play" width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21.4086 9.35258C23.5305 10.5065 23.5305 13.4935 21.4086 14.6474L8.59662 21.6145C6.53435 22.736 4 21.2763 4 18.9671L4 5.0329C4 2.72368 6.53435 1.26402 8.59661 2.38548L21.4086 9.35258Z" />
+            </svg>
+            <svg class="pause" width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 6C2 4.11438 2 3.17157 2.58579 2.58579C3.17157 2 4.11438 2 6 2C7.88562 2 8.82843 2 9.41421 2.58579C10 3.17157 10 4.11438 10 6V18C10 19.8856 10 20.8284 9.41421 21.4142C8.82843 22 7.88562 22 6 22C4.11438 22 3.17157 22 2.58579 21.4142C2 20.8284 2 19.8856 2 18V6Z"/>
+                <path d="M14 6C14 4.11438 14 3.17157 14.5858 2.58579C15.1716 2 16.1144 2 18 2C19.8856 2 20.8284 2 21.4142 2.58579C22 3.17157 22 4.11438 22 6V18C22 19.8856 22 20.8284 21.4142 21.4142C20.8284 22 19.8856 22 18 22C16.1144 22 15.1716 22 14.5858 21.4142C14 20.8284 14 19.8856 14 18V6Z"/>
+            </svg>`;
+        const iconContainer = document.createElement('div');
+        const avatarImg = document.createElement('img');
+        const phoneIcon = `
+        <svg width="30px" height="30px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+          <g>
+            <path fill="#48d44f" d="M75.46,49.16h0.003v-0.098c0-0.006,0-0.013,0-0.019h0V34.787c0-2.088-1.693-3.781-3.782-3.781   c-2.088,0-3.783,1.693-3.783,3.781v14.256c0,9.885-8.013,17.897-17.898,17.897s-17.898-8.013-17.898-17.897h0V34.787   c0-2.088-1.693-3.781-3.782-3.781c-2.088,0-3.783,1.693-3.783,3.781V49.16h0.003c0.058,12.724,9.447,23.243,21.678,25.065v5.438   H32.839v0.003c-2.074,0.018-3.75,1.701-3.75,3.779c0,2.078,1.676,3.761,3.75,3.779v0.003h34.29l0,0   c2.089,0,3.782-1.693,3.782-3.782c0-2.089-1.693-3.782-3.782-3.782l0,0H53.782v-5.438C66.013,72.403,75.403,61.884,75.46,49.16z"/>
+            <path fill="#48d44f" d="M37.186,48.941c0,7.088,5.745,12.833,12.833,12.833c7.087,0,12.831-5.746,12.831-12.833   c0-0.096-0.012-0.188-0.014-0.283h0.053V25.322h-0.053c-0.153-6.955-5.826-12.549-12.817-12.549   c-6.992,0-12.666,5.594-12.819,12.549h-0.052v23.336h0.052C37.199,48.753,37.186,48.845,37.186,48.941z"/>
+          </g>
+        </svg>`
+        
+        
+        track.classList.add("track");
+        controls.classList.add("controls");
+        timeLine.classList.add("timeline");
+        timeLine.id = "waveform";
+
+        iconContainer.classList.add('icon');
+        avatarImg.classList.add('avatar')
+        avatarImg.src = avatarURL;
+        iconContainer.innerHTML = phoneIcon;
+        iconContainer.appendChild(avatarImg);
+
+        playPauseBtn.setAttribute("data-state", "pause");
+        playPauseBtn.innerHTML = playPauseIcons;
+        controls.appendChild(playPauseBtn);
+        track.append(controls, timeLine, iconContainer);        
+
+        container.append(track);
+
+        const wavesurfer = WaveSurfer.create({
+          container: timeLine,
+          waveColor: "#ddd",
+          progressColor: corBarraProgresso,
+          barWidth: 2,
+          cursorWidth: 15,
+          height: 25,
+          url: `audios/${audioname}${audioTipo}`,
+        });
+
+        playPauseBtn.addEventListener("click", (e) => {
+          const state = e.target.dataset.state;
+          if (state === "pause") {
+            wavesurfer.play();
+            e.target.dataset.state = "play";
+          } else {
+            wavesurfer.pause();
+            e.target.dataset.state = "pause";
+          }
+        });
+
+        wavesurfer.on('ready', () => {
+          setTimeout(() => {
+            if(!isMobile) playPauseBtn.click()            
+          }, 1000);
+        });
+        wavesurfer.on("finish", () => (playPauseBtn.dataset.state = "pause"));
+      }
+
+      function detectMob() {
+        const toMatch = [
+            /Android/i,
+            /webOS/i,
+            /iPhone/i,
+            /iPad/i,
+            /iPod/i,
+            /BlackBerry/i,
+            /Windows Phone/i
+        ];        
+        return toMatch.some((toMatchItem) => {
+            return navigator.userAgent.match(toMatchItem);
+        });
+      }
+    </script>
+  </body>
+</html>
